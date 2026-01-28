@@ -6,6 +6,7 @@ import { motion } from 'framer-motion'
 import { Sparkles, Brain, CheckCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { useAuth } from '@/hooks/useAuth'
 
 export default function JudgeDemoPage() {
   const [loading, setLoading] = useState(true)
@@ -13,6 +14,7 @@ export default function JudgeDemoPage() {
   const [currentStep, setCurrentStep] = useState(0)
   const [error, setError] = useState('')
   const router = useRouter()
+  const { register } = useAuth()
 
   const steps = [
     'Loading demo account...',
@@ -34,35 +36,22 @@ export default function JudgeDemoPage() {
           await new Promise(resolve => setTimeout(resolve, stepDuration))
         }
 
-        // Create demo user and load data
-        const registerResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/register`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            email: `judge-demo-${Date.now()}@echotrail.ai`,
-            password: 'demo123'
-          }),
+        // Create demo user using auth context
+        await register({
+          email: `judge-demo-${Date.now()}@echotrail.ai`,
+          password: 'demo123'
         })
-
-        if (!registerResponse.ok) {
-          throw new Error('Failed to create demo account')
-        }
-
-        const { access_token } = await registerResponse.json()
-        localStorage.setItem('token', access_token)
 
         // Load judge demo data
-        const demoResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/demo/judge`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/demo/judge`, {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${access_token}`,
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
             'Content-Type': 'application/json',
           },
         })
 
-        if (!demoResponse.ok) {
+        if (!response.ok) {
           throw new Error('Failed to load demo data')
         }
 
@@ -86,7 +75,7 @@ export default function JudgeDemoPage() {
     }
 
     loadDemo()
-  }, [router])
+  }, [router, register])
 
   if (error) {
     return (
