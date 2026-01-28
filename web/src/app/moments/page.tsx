@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge'
 import AppLayout from '@/components/AppLayout'
 import { useAuth } from '@/hooks/useAuth'
-import { api, formatDate, getEmotionalToneColor } from '@/lib/utils'
+import { api, formatDate, getEmotionalToneColor, removeStoredToken } from '@/lib/utils'
 import { Moment, AnalysisResponse } from '@/types'
 
 export default function MomentsPage() {
@@ -63,7 +63,7 @@ export default function MomentsPage() {
 
   const clearDemoData = async () => {
     try {
-      localStorage.removeItem('token')
+      removeStoredToken()
       router.push('/')
     } catch (error) {
       console.error('Failed to clear demo data:', error)
@@ -71,13 +71,6 @@ export default function MomentsPage() {
   }
 
   if (!isAuthenticated) {
-    // Check if we have a token in localStorage for demo mode
-    const token = localStorage.getItem('token')
-    if (token && (isDemoMode || window.location.search.includes('demo=true'))) {
-      // Force reload to update auth context
-      window.location.reload()
-      return <div>Loading demo...</div>
-    }
     return <div>Please log in to access this page.</div>
   }
 

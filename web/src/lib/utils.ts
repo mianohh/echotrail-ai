@@ -18,7 +18,7 @@ export const api = axios.create({
 
 // Add auth token to requests
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('access_token')
+  const token = getStoredToken()
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
   }
@@ -30,7 +30,7 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('access_token')
+      removeStoredToken()
       window.location.href = '/auth/login'
     }
     return Promise.reject(error)
@@ -98,7 +98,7 @@ export function getEmotionalToneColor(tone: string): string {
 // Local storage utilities
 export function getStoredToken(): string | null {
   if (typeof window === 'undefined') return null
-  return localStorage.getItem('access_token')
+  return localStorage.getItem('access_token') || localStorage.getItem('token')
 }
 
 export function setStoredToken(token: string): void {
