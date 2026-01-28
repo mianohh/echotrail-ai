@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { Sparkles, Play, Calendar, Hash, MessageCircle, Lightbulb, Database, Zap, Crown, X } from 'lucide-react'
+import { Sparkles, Play, Calendar, Hash, Lightbulb, Crown, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -63,7 +63,6 @@ export default function MomentsPage() {
 
   const clearDemoData = async () => {
     try {
-      // This would clear the demo data and redirect to empty state
       localStorage.removeItem('token')
       router.push('/')
     } catch (error) {
@@ -138,6 +137,7 @@ export default function MomentsPage() {
               </Card>
             </motion.div>
           )}
+
           {/* Analysis Stats */}
           {lastAnalysis && (
             <Card className="mb-6 bg-primary/5 border-primary/20">
@@ -256,54 +256,55 @@ export default function MomentsPage() {
                               </span>
                             </CardDescription>
                           </div>
-                        <Badge 
-                          className={getEmotionalToneColor(moment.emotional_tone)}
-                        >
-                          {moment.emotional_tone}
-                        </Badge>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <p className="text-muted-foreground leading-relaxed">
-                        {moment.summary}
-                      </p>
-                      
-                      <div>
-                        <h4 className="font-medium mb-2 flex items-center">
-                          <Hash className="h-4 w-4 mr-1" />
-                          Key Themes
-                        </h4>
-                        <div className="flex flex-wrap gap-2">
-                          {moment.keywords.slice(0, 6).map((keyword, i) => (
-                            <Badge key={i} variant="secondary" className="text-xs">
-                              {keyword}
-                            </Badge>
-                          ))}
+                          <Badge 
+                            className={getEmotionalToneColor(moment.emotional_tone)}
+                          >
+                            {moment.emotional_tone}
+                          </Badge>
                         </div>
-                      </div>
-                      
-                      <div className="bg-muted/50 rounded-lg p-4">
-                        <h4 className="font-medium mb-2 flex items-center text-primary">
-                          <Lightbulb className="h-4 w-4 mr-1" />
-                          Reflection Prompt
-                        </h4>
-                        <p className="text-sm italic">
-                          {moment.reflection_prompt}
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <p className="text-muted-foreground leading-relaxed">
+                          {moment.summary}
                         </p>
-                      </div>
-                      
-                      <div className="flex items-center justify-between text-xs text-muted-foreground pt-2 border-t">
-                        <span>
-                          Emotional Score: {moment.emotional_score > 0 ? '+' : ''}{moment.emotional_score.toFixed(2)}
-                        </span>
-                        <span>
-                          Generated {formatDate(moment.created_at)}
-                        </span>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              ))}
+                        
+                        <div>
+                          <h4 className="font-medium mb-2 flex items-center">
+                            <Hash className="h-4 w-4 mr-1" />
+                            Key Themes
+                          </h4>
+                          <div className="flex flex-wrap gap-2">
+                            {moment.keywords.slice(0, 6).map((keyword, i) => (
+                              <Badge key={i} variant="secondary" className="text-xs">
+                                {keyword}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                        
+                        <div className="bg-muted/50 rounded-lg p-4">
+                          <h4 className="font-medium mb-2 flex items-center text-primary">
+                            <Lightbulb className="h-4 w-4 mr-1" />
+                            Reflection Prompt
+                          </h4>
+                          <p className="text-sm italic">
+                            {moment.reflection_prompt}
+                          </p>
+                        </div>
+                        
+                        <div className="flex items-center justify-between text-xs text-muted-foreground pt-2 border-t">
+                          <span>
+                            Emotional Score: {moment.emotional_score > 0 ? '+' : ''}{moment.emotional_score.toFixed(2)}
+                          </span>
+                          <span>
+                            Generated {formatDate(moment.created_at)}
+                          </span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                )
+              })}
             </div>
           )}
 
