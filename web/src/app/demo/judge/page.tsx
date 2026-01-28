@@ -34,8 +34,8 @@ export default function JudgeDemoPage() {
           await new Promise(resolve => setTimeout(resolve, stepDuration))
         }
 
-        // Use public demo endpoint
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/demo/public`, {
+        // Login as demo user with pre-loaded data
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/demo/login`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' }
         })

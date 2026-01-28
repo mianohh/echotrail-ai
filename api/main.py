@@ -31,12 +31,85 @@ demo_seeder = DemoDataSeeder()
 judge_demo = JudgeDemoData()
 security = HTTPBearer()
 
-# Create tables on startup
+# Create tables and demo data on startup
 @app.on_event("startup")
 def startup_event():
     create_tables()
+    # Create persistent demo user and data
+    create_demo_data()
 
-# Health check
+def create_demo_data():
+    """Create persistent demo user and data on startup"""
+    from database import SessionLocal
+    db = SessionLocal()
+    
+    try:
+        # Check if demo user already exists
+        demo_user = db.query(models.User).filter(models.User.email == "demo@echotrail.ai").first()
+        
+        if not demo_user:
+            # Create demo user
+            hashed_password = get_password_hash("demo123")
+            demo_user = models.User(email="demo@echotrail.ai", hashed_password=hashed_password)
+            db.add(demo_user)
+            db.commit()
+            db.refresh(demo_user)
+            
+            # Load demo notes
+            demo_notes = judge_demo.get_demo_notes()
+            
+            for note_data in demo_notes:
+                note = models.Note(
+                    title=note_data["title"],
+                    content=note_data["content"],
+                    mood=note_data["mood"],
+                    energy_level=note_data["energy_level"],
+                    created_at=note_data["created_at"],
+                    updated_at=note_data["created_at"],
+                    user_id=demo_user.id
+                )
+                db.add(note)
+            
+            # Load precomputed moments
+            precomputed_moments = judge_demo.get_precomputed_moments()
+            
+            for moment_data in precomputed_moments:
+                moment = models.Moment(
+                    title=moment_data['title'],
+                    summary=moment_data['summary'],
+                    emotional_tone=moment_data['emotional_tone'],
+                    emotional_score=moment_data['emotional_score'],
+                    keywords=json.dumps(moment_data['keywords']),
+                    reflection_prompt=moment_data['reflection_prompt'],
+                    start_date=datetime.fromisoformat(moment_data['start_date']),
+                    end_date=datetime.fromisoformat(moment_data['end_date']),
+                    note_count=moment_data['note_count'],
+                    note_ids=json.dumps(moment_data['note_ids']),
+                    user_id=demo_user.id
+                )
+                db.add(moment)
+            
+            db.commit()
+            print(f"Demo data created: {len(demo_notes)} notes, {len(precomputed_moments)} moments")
+        else:
+            print("Demo data already exists")
+            
+    except Exception as e:
+        print(f"Error creating demo data: {e}")        
+        db.rollback()
+    finally:
+        db.close()
+
+# Demo login endpoint
+@app.post("/demo/login")
+def demo_login():
+    """Login as demo user with pre-loaded data"""
+    access_token = create_access_token(data={"sub": "demo@echotrail.ai"})
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "demo_mode": True
+    }
 @app.get("/health")
 def health_check():
     return {"status": "healthy", "timestamp": datetime.utcnow(), "version": "1.0.1"}
