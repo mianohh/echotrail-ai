@@ -242,20 +242,20 @@ export default function MomentsPage() {
                                 </Badge>
                               )}
                             </CardTitle>
-                          <CardDescription className="flex items-center gap-4 text-sm">
-                            <span className="flex items-center gap-1">
-                              <Calendar className="h-4 w-4" />
-                              {formatDate(moment.start_date)}
-                              {moment.start_date !== moment.end_date && (
-                                <> - {formatDate(moment.end_date)}</>
-                              )}
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <Hash className="h-4 w-4" />
-                              {moment.note_count} notes
-                            </span>
-                          </CardDescription>
-                        </div>
+                            <CardDescription className="flex items-center gap-4 text-sm">
+                              <span className="flex items-center gap-1">
+                                <Calendar className="h-4 w-4" />
+                                {formatDate(moment.start_date)}
+                                {moment.start_date !== moment.end_date && (
+                                  <> - {formatDate(moment.end_date)}</>
+                                )}
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <Hash className="h-4 w-4" />
+                                {moment.note_count} notes
+                              </span>
+                            </CardDescription>
+                          </div>
                         <Badge 
                           className={getEmotionalToneColor(moment.emotional_tone)}
                         >
