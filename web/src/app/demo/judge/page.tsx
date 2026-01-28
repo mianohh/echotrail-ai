@@ -44,10 +44,11 @@ export default function JudgeDemoPage() {
           const { access_token } = await response.json()
           localStorage.setItem('token', access_token)
           
-          // Success - navigate to moments
+          // Success - force full page reload to update auth state
           setTimeout(() => {
             setLoading(false)
-            window.location.href = '/moments?demo=true&highlight=A%20Period%20of%20Transition'
+            // Force reload to update auth context
+            window.location.replace('/moments?demo=true&highlight=A%20Period%20of%20Transition')
           }, 500)
         } else {
           throw new Error('Failed to load demo')

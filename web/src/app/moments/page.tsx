@@ -71,6 +71,13 @@ export default function MomentsPage() {
   }
 
   if (!isAuthenticated) {
+    // Check if we have a token in localStorage for demo mode
+    const token = localStorage.getItem('token')
+    if (token && (isDemoMode || window.location.search.includes('demo=true'))) {
+      // Force reload to update auth context
+      window.location.reload()
+      return <div>Loading demo...</div>
+    }
     return <div>Please log in to access this page.</div>
   }
 
