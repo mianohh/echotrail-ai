@@ -6,8 +6,6 @@ import { motion } from 'framer-motion'
 import { Sparkles, Brain, CheckCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { useAuth } from '@/hooks/useAuth'
-import { api } from '@/lib/utils'
 
 export default function JudgeDemoPage() {
   const [loading, setLoading] = useState(true)
@@ -15,7 +13,6 @@ export default function JudgeDemoPage() {
   const [currentStep, setCurrentStep] = useState(0)
   const [error, setError] = useState('')
   const router = useRouter()
-  const { register } = useAuth()
 
   const steps = [
     'Loading demo account...',
@@ -29,34 +26,32 @@ export default function JudgeDemoPage() {
     const loadDemo = async () => {
       try {
         // Simulate loading steps with realistic timing
-        const stepDuration = 800
+        const stepDuration = 600
         
-        for (let i = 0; i < steps.length - 1; i++) {
+        for (let i = 0; i < steps.length; i++) {
           setCurrentStep(i)
           setProgress((i / (steps.length - 1)) * 100)
           await new Promise(resolve => setTimeout(resolve, stepDuration))
         }
 
-        // Create demo user using auth context
-        await register({
-          email: `judge-demo-${Date.now()}@echotrail.ai`,
-          password: 'demo123'
+        // Use public demo endpoint
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/demo/public`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
         })
 
-        // Load judge demo data using authenticated API
-        await api.post('/demo/judge')
-
-        // Complete loading
-        setCurrentStep(steps.length - 1)
-        setProgress(100)
-        
-        // Wait a moment then navigate
-        setTimeout(() => {
-          setLoading(false)
+        if (response.ok) {
+          const { access_token } = await response.json()
+          localStorage.setItem('token', access_token)
+          
+          // Success - navigate to moments
           setTimeout(() => {
-            router.push('/moments?demo=true&highlight=A%20Period%20of%20Transition')
+            setLoading(false)
+            window.location.href = '/moments?demo=true&highlight=A%20Period%20of%20Transition'
           }, 500)
-        }, 1000)
+        } else {
+          throw new Error('Failed to load demo')
+        }
 
       } catch (err) {
         console.error('Demo loading error:', err)
@@ -66,7 +61,7 @@ export default function JudgeDemoPage() {
     }
 
     loadDemo()
-  }, [router, register])
+  }, [])
 
   if (error) {
     return (

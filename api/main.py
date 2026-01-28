@@ -238,6 +238,77 @@ def get_moments(
     
     return response_moments
 
+# Public Demo endpoint (no auth required)
+@app.post("/demo/public")
+def load_public_demo(db: Session = Depends(get_db)):
+    """Load demo data for public access without authentication"""
+    # Create a temporary demo user
+    demo_email = f"public-demo-{int(datetime.utcnow().timestamp())}@echotrail.ai"
+    hashed_password = get_password_hash("demo123")
+    
+    # Check if user already exists
+    existing_user = db.query(models.User).filter(models.User.email == demo_email).first()
+    if existing_user:
+        user = existing_user
+    else:
+        user = models.User(email=demo_email, hashed_password=hashed_password)
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+    
+    # Clear existing data for this user
+    db.query(models.Note).filter(models.Note.user_id == user.id).delete()
+    db.query(models.Moment).filter(models.Moment.user_id == user.id).delete()
+    db.commit()
+    
+    # Load demo notes
+    demo_notes = judge_demo.get_demo_notes()
+    
+    for note_data in demo_notes:
+        note = models.Note(
+            title=note_data["title"],
+            content=note_data["content"],
+            mood=note_data["mood"],
+            energy_level=note_data["energy_level"],
+            created_at=note_data["created_at"],
+            updated_at=note_data["created_at"],
+            user_id=user.id
+        )
+        db.add(note)
+    
+    # Load precomputed moments
+    precomputed_moments = judge_demo.get_precomputed_moments()
+    
+    for moment_data in precomputed_moments:
+        moment = models.Moment(
+            title=moment_data['title'],
+            summary=moment_data['summary'],
+            emotional_tone=moment_data['emotional_tone'],
+            emotional_score=moment_data['emotional_score'],
+            keywords=json.dumps(moment_data['keywords']),
+            reflection_prompt=moment_data['reflection_prompt'],
+            start_date=datetime.fromisoformat(moment_data['start_date']),
+            end_date=datetime.fromisoformat(moment_data['end_date']),
+            note_count=moment_data['note_count'],
+            note_ids=json.dumps(moment_data['note_ids']),
+            user_id=user.id
+        )
+        db.add(moment)
+    
+    db.commit()
+    
+    # Create access token for this user
+    access_token = create_access_token(data={"sub": user.email})
+    
+    return {
+        "success": True,
+        "access_token": access_token,
+        "token_type": "bearer",
+        "notes_created": len(demo_notes),
+        "moments_created": len(precomputed_moments),
+        "demo_mode": True
+    }
+
 # Judge Demo Mode endpoint
 @app.post("/demo/judge")
 def load_judge_demo(
