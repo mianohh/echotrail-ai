@@ -12,6 +12,7 @@ import schemas
 from auth import get_password_hash, verify_password, create_access_token, get_current_user
 from analyzer import MomentAnalyzer
 from judge_demo import JudgeDemoData
+from demo_data import DemoDataSeeder
 
 app = FastAPI(title="EchoTrail AI API", version="1.0.0")
 
