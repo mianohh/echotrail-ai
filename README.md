@@ -10,7 +10,7 @@
 ## Quick Demo Flow (60 seconds)
 
 1. **Register** → Clean auth flow, instant access
-2. **Load Demo Data** → 35 realistic notes spanning 3 weeks of life
+2. **Load Demo Data** → 32 realistic notes spanning 16 days of life
 3. **Run Analysis** → AI generates 6-8 meaningful moments in <5 seconds
 4. **Explore Insights** → Interactive charts showing mood patterns and emotional trends
 
@@ -41,7 +41,7 @@ Unlike simple journaling apps, EchoTrail AI provides:
 ## Performance & Determinism
 
 - **Caching**: Analysis results cached by `hash(notes + parameters)` for instant re-access
-- **Time-Bounded**: Clustering completes in <5 seconds for demo datasets (35 notes)
+- **Time-Bounded**: Clustering completes in <5 seconds for demo datasets (32 notes)
 - **Deterministic**: Same input always produces identical moments and insights
 - **Scalable**: Handles 100+ notes efficiently with optimized algorithms
 
@@ -116,22 +116,13 @@ npm install && npm run dev
    SECRET_KEY=your-secret-key
    ```
 
-## Judging Criteria Mapping
-
-**🚀 Innovation**: Novel temporal-semantic clustering for life moment reconstruction  
-**⚙️ Technical Implementation**: Full-stack TypeScript, FastAPI, ML pipeline, real-time analysis  
-**🎯 Impact**: Addresses mental health, self-reflection, and memory enhancement needs  
-**🎨 UX/Design**: Premium dark UI, smooth animations, intuitive flow, mobile-responsive  
-**📽️ Presentation**: Live demo, clear value prop, compelling narrative, polished assets  
-**✅ Compliance**: Open source, privacy-focused, accessible, well-documented
-
 ## Features
 
 - ✅ **Smart Clustering**: AI groups related notes by content + time proximity
 - ✅ **Emotional Intelligence**: Sentiment analysis with personalized reflection prompts  
 - ✅ **Interactive Insights**: Mood trends, energy patterns, keyword clouds
 - ✅ **Premium UI**: Dark mode, animations, responsive design, empty states
-- ✅ **Demo Mode**: 35 realistic notes → 6-8 moments in seconds
+- ✅ **Demo Mode**: 32 realistic notes → 6 moments in seconds
 - ✅ **Free Deployment**: Vercel + Render compatible, zero hosting costs
 
 ## Troubleshooting
@@ -140,17 +131,7 @@ npm install && npm run dev
 **CORS Errors**: Verify `NEXT_PUBLIC_API_URL` matches your backend URL  
 **Build Failures**: Check all environment variables are set correctly
 
-## Submission Checklist
-
-- [ ] Live demo deployed and accessible
-- [ ] Demo video recorded (2-3 minutes)
-- [ ] Screenshots captured (8 key screens)
-- [ ] Devpost submission completed
-- [ ] GitHub repo polished and public
-- [ ] All environment variables documented
-- [ ] Performance tested with demo data
-
 ---
 
 **Built with ❤️ for meaningful memory reconstruction**  
-MIT License • [Devpost](https://devpost.com/software/echotrail-ai) • [Demo Video](https://youtu.be/placeholder) • [Live Demo](https://echotrail-ai.vercel.app)
+MIT License • [Live Demo](https://echotrail-ai.vercel.app)

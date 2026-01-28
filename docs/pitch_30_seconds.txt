@@ -1,5 +1,0 @@
-We capture hundreds of thoughts in notes but they stay scattered and meaningless. EchoTrail AI solves this with temporal-semantic clustering—it groups your notes by content similarity AND time proximity to create "Moments" with emotional insights and reflection prompts. 
-
-Unlike simple journaling apps, we provide AI-powered pattern recognition that reveals your emotional trajectories, recurring themes, and personal growth over time. Our demo shows 35 notes becoming 7 meaningful moments in under 5 seconds.
-
-Built with Next.js and FastAPI, deployed on free tiers, with production-quality UX. This isn't just note storage—it's memory reconstruction that helps you understand your inner life and make better decisions through self-awareness.

@@ -1,8 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { Sparkles, Play, Calendar, Hash, MessageCircle, Lightbulb, Database, Zap } from 'lucide-react'
+import { Sparkles, Play, Calendar, Hash, MessageCircle, Lightbulb, Database, Zap, Crown, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -16,14 +17,22 @@ export default function MomentsPage() {
   const [loading, setLoading] = useState(false)
   const [analyzing, setAnalyzing] = useState(false)
   const [lastAnalysis, setLastAnalysis] = useState<AnalysisResponse | null>(null)
+  const [showDemoNotice, setShowDemoNotice] = useState(false)
   
   const { isAuthenticated } = useAuth()
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const isDemoMode = searchParams.get('demo') === 'true'
+  const highlightMoment = searchParams.get('highlight')
 
   useEffect(() => {
     if (isAuthenticated) {
       fetchMoments()
+      if (isDemoMode) {
+        setShowDemoNotice(true)
+      }
     }
-  }, [isAuthenticated])
+  }, [isAuthenticated, isDemoMode])
 
   const fetchMoments = async () => {
     setLoading(true)
@@ -52,16 +61,13 @@ export default function MomentsPage() {
     }
   }
 
-  const seedDemoData = async () => {
-    setLoading(true)
+  const clearDemoData = async () => {
     try {
-      await api.post('/demo/seed')
-      // After seeding, run analysis
-      await runAnalysis()
+      // This would clear the demo data and redirect to empty state
+      localStorage.removeItem('token')
+      router.push('/')
     } catch (error) {
-      console.error('Failed to seed demo data:', error)
-    } finally {
-      setLoading(false)
+      console.error('Failed to clear demo data:', error)
     }
   }
 
@@ -86,14 +92,6 @@ export default function MomentsPage() {
             </div>
             <div className="flex gap-2">
               <Button 
-                variant="outline" 
-                onClick={seedDemoData}
-                disabled={loading}
-              >
-                <Database className="h-4 w-4 mr-2" />
-                Load Demo Data
-              </Button>
-              <Button 
                 onClick={runAnalysis}
                 disabled={analyzing}
               >
@@ -103,6 +101,43 @@ export default function MomentsPage() {
             </div>
           </div>
 
+          {/* Demo Mode Notice */}
+          {showDemoNotice && (
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-6"
+            >
+              <Card className="bg-gradient-to-r from-primary/10 to-primary/5 border-primary/20">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <Crown className="h-5 w-5 text-primary" />
+                      <div>
+                        <h3 className="font-semibold text-primary">Demo Mode Active</h3>
+                        <p className="text-sm text-muted-foreground">
+                          You're viewing curated demo data with 32 notes and 6 moments. 
+                          Look for the highlighted "A Period of Transition" moment below.
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Button variant="outline" size="sm" onClick={clearDemoData}>
+                        Clear Demo Data
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={() => setShowDemoNotice(false)}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          )}
           {/* Analysis Stats */}
           {lastAnalysis && (
             <Card className="mb-6 bg-primary/5 border-primary/20">
@@ -168,9 +203,9 @@ export default function MomentsPage() {
                   Create some notes first, then run the AI analysis to generate meaningful moments from your experiences.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                  <Button onClick={seedDemoData} disabled={loading}>
-                    <Database className="h-4 w-4 mr-2" />
-                    Try Demo Data
+                  <Button onClick={() => router.push('/demo/judge')} disabled={loading}>
+                    <Crown className="h-4 w-4 mr-2" />
+                    Try Demo
                   </Button>
                   <Button variant="outline" onClick={runAnalysis} disabled={analyzing}>
                     <Play className="h-4 w-4 mr-2" />
@@ -181,20 +216,32 @@ export default function MomentsPage() {
             </Card>
           ) : (
             <div className="space-y-6">
-              {moments.map((moment, index) => (
-                <motion.div
-                  key={moment.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                >
-                  <Card className="hover:shadow-lg transition-shadow">
-                    <CardHeader>
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <CardTitle className="text-xl mb-2">
-                            {moment.title}
-                          </CardTitle>
+              {moments.map((moment, index) => {
+                const isHighlighted = highlightMoment && moment.title === decodeURIComponent(highlightMoment)
+                return (
+                  <motion.div
+                    key={moment.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                  >
+                    <Card className={`hover:shadow-lg transition-all ${
+                      isHighlighted 
+                        ? 'ring-2 ring-primary shadow-lg bg-gradient-to-r from-primary/5 to-primary/10' 
+                        : ''
+                    }`}>
+                      <CardHeader>
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <CardTitle className="text-xl mb-2 flex items-center">
+                              {isHighlighted && <Crown className="h-5 w-5 text-primary mr-2" />}
+                              {moment.title}
+                              {isHighlighted && (
+                                <Badge className="ml-2 bg-primary text-primary-foreground">
+                                  Standout Moment
+                                </Badge>
+                              )}
+                            </CardTitle>
                           <CardDescription className="flex items-center gap-4 text-sm">
                             <span className="flex items-center gap-1">
                               <Calendar className="h-4 w-4" />

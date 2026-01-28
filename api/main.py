@@ -11,7 +11,7 @@ import models
 import schemas
 from auth import get_password_hash, verify_password, create_access_token, get_current_user
 from analyzer import MomentAnalyzer
-from demo_data import DemoDataSeeder
+from judge_demo import JudgeDemoData
 
 app = FastAPI(title="EchoTrail AI API", version="1.0.0")
 
@@ -27,6 +27,7 @@ app.add_middleware(
 # Initialize components
 analyzer = MomentAnalyzer()
 demo_seeder = DemoDataSeeder()
+judge_demo = JudgeDemoData()
 security = HTTPBearer()
 
 # Create tables on startup
@@ -235,6 +236,69 @@ def get_moments(
         })
     
     return response_moments
+
+# Judge Demo Mode endpoint
+@app.post("/demo/judge")
+def load_judge_demo(
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Load deterministic demo data designed for judge evaluation"""
+    start_time = time.time()
+    
+    # Clear existing data
+    db.query(models.Note).filter(models.Note.user_id == current_user.id).delete()
+    db.query(models.Moment).filter(models.Moment.user_id == current_user.id).delete()
+    db.commit()
+    
+    # Load judge demo notes
+    demo_notes = judge_demo.get_demo_notes()
+    
+    # Save notes to database
+    for note_data in demo_notes:
+        note = models.Note(
+            title=note_data["title"],
+            content=note_data["content"],
+            mood=note_data["mood"],
+            energy_level=note_data["energy_level"],
+            created_at=note_data["created_at"],
+            updated_at=note_data["created_at"],
+            user_id=current_user.id
+        )
+        db.add(note)
+    
+    db.commit()
+    
+    # Load precomputed moments for deterministic results
+    precomputed_moments = judge_demo.get_precomputed_moments()
+    
+    for moment_data in precomputed_moments:
+        moment = models.Moment(
+            title=moment_data['title'],
+            summary=moment_data['summary'],
+            emotional_tone=moment_data['emotional_tone'],
+            emotional_score=moment_data['emotional_score'],
+            keywords=json.dumps(moment_data['keywords']),
+            reflection_prompt=moment_data['reflection_prompt'],
+            start_date=datetime.fromisoformat(moment_data['start_date']),
+            end_date=datetime.fromisoformat(moment_data['end_date']),
+            note_count=moment_data['note_count'],
+            note_ids=json.dumps(moment_data['note_ids']),
+            user_id=current_user.id
+        )
+        db.add(moment)
+    
+    db.commit()
+    
+    return {
+        "success": True,
+        "message": "Judge demo data loaded successfully",
+        "notes_created": len(demo_notes),
+        "moments_created": len(precomputed_moments),
+        "load_time": time.time() - start_time,
+        "standout_moment": "A Period of Transition",
+        "demo_mode": True
+    }
 
 # Demo data endpoints
 @app.post("/demo/seed")

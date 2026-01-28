@@ -3,7 +3,7 @@
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { ArrowRight, Sparkles, Brain, Heart, TrendingUp } from 'lucide-react'
+import { ArrowRight, Sparkles, Brain, Heart, TrendingUp, Play } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { useAuth } from '@/hooks/useAuth'
@@ -75,7 +75,7 @@ export default function HomePage() {
             <span className="text-primary font-semibold"> AI-powered insights</span>
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
             <Button 
               size="lg" 
               className="text-lg px-8 py-6"
@@ -93,6 +93,30 @@ export default function HomePage() {
               Sign In
             </Button>
           </div>
+          
+          {/* Judge Demo Button */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="mb-16"
+          >
+            <Card className="max-w-md mx-auto bg-gradient-to-r from-primary/10 to-primary/5 border-primary/20">
+              <CardContent className="p-6 text-center">
+                <Play className="h-8 w-8 text-primary mx-auto mb-3" />
+                <h3 className="font-semibold text-lg mb-2">Demo Mode</h3>
+                <p className="text-muted-foreground mb-4">
+                  Experience EchoTrail AI instantly with curated demo data
+                </p>
+                <Button 
+                  className="w-full bg-primary hover:bg-primary/90"
+                  onClick={() => router.push('/demo/judge')}
+                >
+                  ▶ View Demo
+                </Button>
+              </CardContent>
+            </Card>
+          </motion.div>
         </motion.div>
 
         {/* Features Grid */}
