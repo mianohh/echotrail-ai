@@ -1,0 +1,4 @@
+DATABASE_URL=sqlite:///./echotrail.db
+SECRET_KEY=your-super-secret-key-min-32-chars-long
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=30
