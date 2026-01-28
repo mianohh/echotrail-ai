@@ -37,7 +37,7 @@ def startup_event():
 # Health check
 @app.get("/health")
 def health_check():
-    return {"status": "healthy", "timestamp": datetime.utcnow()}
+    return {"status": "healthy", "timestamp": datetime.utcnow(), "version": "1.0.1"}
 
 # Authentication endpoints
 @app.post("/auth/register", response_model=schemas.Token)
