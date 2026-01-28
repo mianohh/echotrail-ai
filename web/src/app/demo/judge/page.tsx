@@ -7,6 +7,7 @@ import { Sparkles, Brain, CheckCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { useAuth } from '@/hooks/useAuth'
+import { api } from '@/lib/utils'
 
 export default function JudgeDemoPage() {
   const [loading, setLoading] = useState(true)
@@ -42,18 +43,8 @@ export default function JudgeDemoPage() {
           password: 'demo123'
         })
 
-        // Load judge demo data
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/demo/judge`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
-            'Content-Type': 'application/json',
-          },
-        })
-
-        if (!response.ok) {
-          throw new Error('Failed to load demo data')
-        }
+        // Load judge demo data using authenticated API
+        await api.post('/demo/judge')
 
         // Complete loading
         setCurrentStep(steps.length - 1)
