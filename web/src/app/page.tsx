@@ -75,6 +75,10 @@ export default function HomePage() {
             <span className="text-primary font-semibold"> AI-powered insights</span>
           </p>
           
+          <p className="text-sm text-muted-foreground mb-8 italic">
+            Built during the Orygn AI Open Hackathon.
+          </p>
+          
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
             <Button 
               size="lg" 
